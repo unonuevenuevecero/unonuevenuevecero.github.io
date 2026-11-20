@@ -44,6 +44,18 @@ button,select{font:inherit;color:inherit;background:none;border:0;cursor:pointer
 .filtros select:focus-visible{outline-offset:1px}
 .limpiar{color:var(--grey);font-size:15px;text-decoration:underline}
 .contador{color:var(--grey);font-size:15px;margin:0 auto}
+.hl{display:flex;flex-direction:column;align-items:flex-start;gap:12px}.contador.cm{display:none;margin:0;font-size:13px}
+#sent{height:0}
+@media(max-width:899px){
+  .barra .contador{display:none}.contador.cm{display:block}
+  /* al bajar por el índice o las series, el menú y los filtros quedan fijos pero más chicos */
+  .barra.comp{padding:6px var(--pad);gap:3px 12px}
+  .barra.comp .izq{gap:2px 12px}
+  .barra.comp .vistas{gap:0 min(10px,2.4vw);flex-wrap:nowrap;max-width:100%}
+  .barra.comp .vistas button,.barra.comp .vistas a{font-size:min(11px,2.7vw);padding:2px 0;border-bottom-width:1.5px;white-space:nowrap}
+  .barra.comp .filtros{gap:10px}
+  .barra.comp .filtros select{font-size:12px;padding:2px 12px 2px 0}
+}
 .barra.sinfiltros .filtros{display:none}
 @media(max-width:899px){.filtros{flex:1 0 100%;flex-wrap:nowrap;gap:12px}.filtros select{flex:1 1 0;min-width:0;width:100%}}
 @media(min-width:900px){
@@ -162,10 +174,11 @@ main.sinpad{padding:0;min-height:0}
 .pzl-sel button[aria-pressed=true]{opacity:1;outline-color:var(--ink)}
 .pzl-sel img{width:100%;height:100%;object-fit:cover;display:block}
 .pzl-board{position:relative;touch-action:none;user-select:none;-webkit-user-select:none}
-.pt{position:absolute;box-sizing:border-box;background-repeat:no-repeat;box-shadow:inset 0 0 0 2px var(--paper);transition:left .16s ease,top .16s ease,box-shadow .5s;cursor:grab}
-.pt.vacia{opacity:0;pointer-events:none;transition:left .16s ease,top .16s ease,opacity .7s}
+.pt{position:absolute;box-sizing:border-box;background-repeat:no-repeat;box-shadow:inset 0 0 0 2px var(--paper);transition:left .18s ease,top .18s ease,transform .18s ease,box-shadow .5s;cursor:grab}
+.pt.sel{z-index:2;transform:scale(1.045);box-shadow:inset 0 0 0 2px var(--paper),0 0 0 2px var(--ink)}
+.pt.tgt{box-shadow:inset 0 0 0 3px var(--ink)}
+.pt.arr{z-index:3;transition:none;cursor:grabbing}
 .pzl-board.ok .pt{box-shadow:inset 0 0 0 0 transparent;cursor:default}
-.pzl-board.ok .pt.vacia{opacity:1}
 .pzl-bar{display:flex;gap:22px;align-items:baseline;font-size:15px;color:var(--grey);flex-wrap:wrap;justify-content:center}
 .pzl-bar button{font-weight:700;color:var(--ink);font-size:16px}
 /* Galaxia y Papelera: texto */
@@ -228,7 +241,7 @@ html[data-modo=catarsis] [data-c="8"]{--cbg:#FC4049;--ink:#000}
 <header class="hero">
   <button class="firma" id="firma" aria-label="Firma 1990"><span id="fsp">1990</span></button>
   <div class="fila2">
-    <a class="mani" href="manifiesto.html">Manifiesto</a>
+    <div class="hl"><a class="mani" href="manifiesto.html">Manifiesto</a><span class="contador cm" id="contador2"></span></div>
     <div class="der"><p class="sello" id="sello">ARCHIVO GRÁFICO EXPERIMENTAL</p>
       <div class="modos" role="group" aria-label="Modo de color">
         <button data-modo="light" aria-pressed="true">light</button>
@@ -237,6 +250,7 @@ html[data-modo=catarsis] [data-c="8"]{--cbg:#FC4049;--ink:#000}
       </div></div>
   </div>
 </header>
+<div id="sent" aria-hidden="true"></div>
 
 
 <nav class="barra" aria-label="Navegación y filtros">
@@ -415,7 +429,7 @@ function setModo(m){ document.documentElement.dataset.modo=m; try{ localStorage.
 
 function pintarContador(){
   const c=OBRAS.filter(o=>vistos.has(o.n)).length, N=OBRAS.length;
-  $("#contador").textContent = c>=N ? "Las viste todas" : `Viste ${c} de ${N}`;
+  $("#contador").textContent = $("#contador2").textContent = c>=N ? "Las viste todas" : `Viste ${c} de ${N}`;
 }
 function pintarBarra(){
   $("#filtros").innerHTML = FILTROS.map(([k,et]) => {
@@ -431,6 +445,11 @@ const codB = i => `LB_${String(LADOB[i].fecha).slice(-2)}_${pad(i+1)}`;
 const arteB = i => LADOB[i].img || arte({n:900+i,tipo:"croquis"});
 let loopB=0;
 /* el slider mide en PC lo mismo que el menú (de Índice a Descargables); en celular, de lado a lado */
+function actCompacta(){ const b=$(".barra"), on=(vista==="indice"||vista==="series")&&$("#sent").getBoundingClientRect().top<-24;
+  if(on===b.classList.contains("comp")) return;
+  if(on){ const h0=b.offsetHeight; b.classList.add("comp"); b.style.marginBottom=Math.max(0,h0-b.offsetHeight)+"px"; }   /* el hueco que deja la barra al achicarse se reserva: el contenido no salta */
+  else{ b.classList.remove("comp"); b.style.marginBottom=""; } }
+addEventListener("scroll",actCompacta,{passive:true}); addEventListener("resize",()=>{ const b=$(".barra"); b.classList.remove("comp"); b.style.marginBottom=""; actCompacta(); });
 function medirTam(){ const a=document.querySelector(".vistas button"), z=document.querySelector(".vistas a");
   const pc=matchMedia("(min-width:900px)").matches;
   document.documentElement.style.setProperty("--tamw", pc&&a&&z ? Math.round(z.getBoundingClientRect().right-a.getBoundingClientRect().left)+"px" : "100%"); }
@@ -448,60 +467,56 @@ function pintarGalaxia(){
   iniciarPar();
 }
 /* Puzzle deslizante: obras elegidas, cada una con su grilla (c = columnas, r = filas) */
-const PUZZLE=[{n:33,c:3,r:3},{n:36,c:4,r:3,img:"img/0036_b.jpg"},{n:4,c:3,r:5},{n:19,c:4,r:4},{n:32,c:5,r:4}]; let pzObra=PUZZLE[0].n;
+const PUZZLE=[{n:33,c:3,r:3},{n:36,c:4,r:3,img:"img/0036_b.jpg"},{n:4,c:3,r:5},{n:43,c:4,r:4,img:"img/0043_b.jpg"},{n:32,c:5,r:4}]; let pzObra=PUZZLE[0].n;
 function pintarPuzzle(){
-  $("#main").innerHTML=`<div class="pap-txt"><p>Deslizá las piezas hasta reconstruir la obra.</p></div>
-  <div class="pzl"><div class="pzl-sel" role="group" aria-label="Elegí una obra">${PUZZLE.map(({n})=>{ const o=OBRAS.find(x=>x.n===n); return `<button data-pz="${n}" aria-pressed="${n===pzObra}" aria-label="${o.titulo}"><img src="${PUZZLE.find(x=>x.n===n).img||arte(o)}" alt="" draggable="false"></button>`; }).join("")}</div>
+  $("#main").innerHTML=`<div class="pzl"><div class="pzl-sel" role="group" aria-label="Elegí una obra">${PUZZLE.map(({n})=>{ const o=OBRAS.find(x=>x.n===n); return `<button data-pz="${n}" aria-pressed="${n===pzObra}" aria-label="${o.titulo}"><img src="${PUZZLE.find(x=>x.n===n).img||arte(o)}" alt="" draggable="false"></button>`; }).join("")}</div>
   <div class="pzl-board" id="pzb"></div>
-  <div class="pzl-bar"><span id="pzm"></span><button id="pzr">Mezclar</button><button id="pzv" hidden>Ver ficha</button></div></div>`;
+  <div class="pzl-bar"><span id="pzm"></span><button id="pzr">Mezclar</button></div></div>`;
   iniciarPuzzle();
 }
 function iniciarPuzzle(){
   const id=++loopB, cfg=PUZZLE.find(x=>x.n===pzObra)||PUZZLE[0], C=cfg.c, R=cfg.r, N=C*R, o=OBRAS.find(x=>x.n===cfg.n), box=$("#pzb"), im=new Image(), key="1990-pz-"+o.n;
-  let arr=[], mov=0, resuelto=false, tw=0, th=0;
-  const msg=$("#pzm"), bV=$("#pzv"), tiles=[];
+  let arr=[], mov=0, resuelto=false, tw=0, th=0, sel=-1, drag=null;
+  const msg=$("#pzm"), tiles=[];
   const mejor=()=>{ try{ return +localStorage.getItem(key)||0; }catch(_){ return 0; } };
-  const txt=()=>{ const m=mejor(); msg.textContent = resuelto ? `Resuelto en ${mov} movimientos${m?` · mejor: ${m}`:""}` : `${mov} movimientos${m?` · mejor: ${m}`:""}`; };
-  const colocar=()=>{ arr.forEach((t,idx)=>{ const el=tiles[t]; el.style.left=(idx%C)*tw+"px"; el.style.top=Math.floor(idx/C)*th+"px"; }); };
-  function mover(idx){ if(resuelto) return false; const b=arr.indexOf(N-1), r=Math.floor(idx/C), c=idx%C, rb=Math.floor(b/C), cb=b%C;
-    if(idx===b||(r!==rb&&c!==cb)) return false;   /* fila o columna del hueco: se corre toda la fila de piezas */
-    const st=r===rb?Math.sign(b-idx):Math.sign(rb-r)*C; for(let p=b;p!==idx;p-=st) arr[p]=arr[p-st]; arr[idx]=N-1; mov++; colocar();
-    if(arr.every((t,i)=>t===i)){ resuelto=true; box.classList.add("ok"); bV.hidden=false; const m=mejor(); if(!m||mov<m){ try{ localStorage.setItem(key,mov); }catch(_){} } }
-    txt(); return true; }
-  function mezclar(){ arr=[...Array(N).keys()]; mov=0; resuelto=false; box.classList.remove("ok"); bV.hidden=true;
-    let prev=-1; for(let i=0;i<N*40;i++){ const b=arr.indexOf(N-1), r=Math.floor(b/C), c=b%C, v=[];
-      if(r>0) v.push(b-C); if(r<R-1) v.push(b+C); if(c>0) v.push(b-1); if(c<C-1) v.push(b+1);
-      const w=v.filter(x=>x!==prev), q=w[Math.floor(Math.random()*w.length)]; prev=b; [arr[q],arr[b]]=[arr[b],arr[q]]; }
-    if(arr.every((t,i)=>t===i)) return mezclar(); colocar(); txt(); }
+  const txt=()=>{ const m=mejor(); const pl=n=>n===1?"movimiento":"movimientos"; msg.textContent = resuelto ? `Resuelto en ${mov} ${pl(mov)}${m?` · mejor: ${m}`:""}` : `${mov} ${pl(mov)}${m?` · mejor: ${m}`:""}`; };
+  const colocar=()=>{ arr.forEach((t,idx)=>{ const el=tiles[t]; el.style.left=(idx%C)*tw+"px"; el.style.top=Math.floor(idx/C)*th+"px"; el.style.transform=""; }); };
+  const marcar=()=>{ tiles.forEach((el,t)=>el.classList.toggle("sel",!resuelto&&arr.indexOf(t)===sel)); };
+  function cambiar(i,j){ if(resuelto||i===j) return; [arr[i],arr[j]]=[arr[j],arr[i]]; mov++; sel=-1; colocar(); marcar();
+    if(arr.every((t,k)=>t===k)){ resuelto=true; box.classList.add("ok"); tiles.forEach(e=>e.classList.remove("sel","tgt")); const m=mejor(); if(!m||mov<m){ try{ localStorage.setItem(key,mov); }catch(_){} }
+      setTimeout(()=>{ if(id===loopB&&vista==="puzzle") abrir(o.n); },1500); }   /* al completarlo se abre la obra */
+    txt(); }
+  function mezclar(){ arr=[...Array(N).keys()]; mov=0; resuelto=false; sel=-1; box.classList.remove("ok");
+    do{ for(let i=N-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } }while(arr.some((t,i)=>t===i));   /* ninguna pieza arranca en su lugar */
+    colocar(); marcar(); txt(); }
   im.onload=()=>{ if(id!==loopB) return; const ar=im.naturalWidth/im.naturalHeight, wrap=$(".pzl");
-    const disp=innerHeight-$(".barra").offsetHeight-$(".pap-txt").offsetHeight-$(".pzl-sel").offsetHeight-90;
+    const disp=innerHeight-$(".barra").offsetHeight-$(".pzl-sel").offsetHeight-90;
     let w=Math.min(wrap.clientWidth-2*parseFloat(getComputedStyle(wrap).paddingLeft),640), h=w/ar; if(h>disp){ h=Math.max(disp,200); w=h*ar; }
     tw=Math.floor(w/C); th=Math.floor(h/R); w=tw*C; h=th*R;   /* piezas de tamaño entero: quedan perfectamente alineadas */
     box.style.width=w+"px"; box.style.height=h+"px";
-    for(let t=0;t<N;t++){ const d=document.createElement("div"); d.className="pt"+(t===N-1?" vacia":""); d.dataset.t=t;
+    for(let t=0;t<N;t++){ const d=document.createElement("div"); d.className="pt"; d.dataset.t=t;
       d.style.width=tw+"px"; d.style.height=th+"px"; d.style.backgroundSize=`${w}px ${h}px`;
       d.style.backgroundImage=`url("${im.src}")`; d.style.backgroundPosition=`${-(t%C)*tw}px ${-Math.floor(t/C)*th}px`; box.appendChild(d); tiles[t]=d; }
     mezclar(); };
   im.src=cfg.img||arte(o);
-  /* Arrastre: se agarra una pieza (o una fila de piezas) junto al hueco y se la lleva hasta él; un toque simple también la mueve */
-  let drag=null;
-  box.addEventListener("pointerdown",e=>{ if(resuelto||drag) return; const el=e.target.closest(".pt"); if(!el||el.classList.contains("vacia")) return;
-    const idx=arr.indexOf(+el.dataset.t), b=arr.indexOf(N-1), r=Math.floor(idx/C), c=idx%C, rb=Math.floor(b/C), cb=b%C; if(r!==rb&&c!==cb) return;
-    const horiz=r===rb, dir=horiz?Math.sign(cb-c):Math.sign(rb-r), st=horiz?dir:dir*C, chain=[];
-    for(let p=idx;p!==b;p+=st){ const t=tiles[arr[p]]; chain.push({t,l:parseFloat(t.style.left),tp:parseFloat(t.style.top)}); }
-    drag={x:e.clientX,y:e.clientY,horiz,dir,chain,size:horiz?tw:th,d:0,moved:false,idx};
-    try{ box.setPointerCapture(e.pointerId); }catch(_){} chain.forEach(o=>o.t.style.transition="none"); });
-  box.addEventListener("pointermove",e=>{ if(!drag) return; const raw=(drag.horiz?e.clientX-drag.x:e.clientY-drag.y)*drag.dir;
-    if(Math.abs(raw)>5) drag.moved=true; if(!drag.moved) return; drag.d=Math.max(0,Math.min(drag.size,raw));
-    drag.chain.forEach(o=>{ if(drag.horiz) o.t.style.left=o.l+drag.dir*drag.d+"px"; else o.t.style.top=o.tp+drag.dir*drag.d+"px"; }); });
-  const soltar=()=>{ if(!drag) return; const g=drag; drag=null; g.chain.forEach(o=>o.t.style.transition="");
-    if(!g.moved) mover(g.idx); else if(g.d>g.size*.35) mover(g.idx); else colocar(); };   /* toque simple = mover; arrastre largo = mover; arrastre corto = vuelve */
-  box.addEventListener("pointerup",soltar); box.addEventListener("pointercancel",()=>{ if(drag){ drag.moved=true; drag.d=0; } soltar(); });
+  /* Una pieza se lleva (arrastrando) hasta cualquier otra y las dos intercambian lugar; también sirve tocar una y después otra */
+  const celda=e=>{ const r=box.getBoundingClientRect(); const c=Math.max(0,Math.min(C-1,Math.floor((e.clientX-r.left)/tw))), f=Math.max(0,Math.min(R-1,Math.floor((e.clientY-r.top)/th))); return f*C+c; };
+  box.addEventListener("pointerdown",e=>{ if(resuelto||drag) return; const el=e.target.closest(".pt"); if(!el) return;
+    drag={t:+el.dataset.t,idx:arr.indexOf(+el.dataset.t),x:e.clientX,y:e.clientY,moved:false,to:-1};
+    try{ box.setPointerCapture(e.pointerId); }catch(_){} });
+  box.addEventListener("pointermove",e=>{ if(!drag) return; const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+    if(!drag.moved&&Math.hypot(dx,dy)>6){ drag.moved=true; sel=drag.idx; marcar(); tiles[drag.t].classList.add("arr"); }
+    if(!drag.moved) return;
+    tiles[drag.t].style.transform=`translate(${dx}px,${dy}px) scale(1.045)`;
+    const to=celda(e); if(to!==drag.to){ if(drag.to>=0) tiles[arr[drag.to]].classList.remove("tgt"); drag.to=to; if(to!==drag.idx) tiles[arr[to]].classList.add("tgt"); } });
+  const soltar=cancel=>{ if(!drag) return; const g=drag; drag=null; tiles.forEach(el=>el.classList.remove("tgt","arr"));
+    if(g.moved){ const to=cancel===true?g.idx:(g.to<0?g.idx:g.to); sel=-1; if(to!==g.idx) cambiar(g.idx,to); else { colocar(); marcar(); } return; }
+    if(sel<0) sel=g.idx; else if(sel===g.idx) sel=-1; else { cambiar(sel,g.idx); return; }
+    marcar(); };
+  box.addEventListener("pointerup",()=>soltar()); box.addEventListener("pointercancel",()=>soltar(true));
   $(".pzl-sel").addEventListener("click",e=>{ const b=e.target.closest("[data-pz]"); if(b){ pzObra=+b.dataset.pz; pintarPuzzle(); pintarCat(); } });
   $("#pzr").addEventListener("click",()=>{ if(tiles.length) mezclar(); });
-  bV.addEventListener("click",()=>abrir(o.n));
-  window.parB=k=>{ if(id!==loopB||!tiles.length) return false; const b=arr.indexOf(N-1), c=b%C;
-    if(k==="arrowleft"&&c<C-1) mover(b+1); else if(k==="arrowright"&&c>0) mover(b-1); else if(k==="arrowup"&&b<C*(R-1)) mover(b+C); else if(k==="arrowdown"&&b>=C) mover(b-C); else return false; return true; };
+  window.parB=()=>false;
 }
 /* Papelera: archivador vertical */
 function pintarPapelera(){
@@ -597,7 +612,7 @@ function pintar(){ pintar0(); pintarCat(); }
 function pintar0(){
   const lista = visibles(); pintarBarra();
   document.querySelectorAll(".vistas [data-v]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===vista));
-  $(".barra").classList.toggle("sinfiltros",vista==="papelera"||vista==="galaxia"||vista==="puzzle");
+  $(".barra").classList.toggle("sinfiltros",vista==="papelera"||vista==="galaxia"||vista==="puzzle"); actCompacta();
   $("#main").classList.toggle("sinpad",vista==="papelera"||vista==="galaxia"||vista==="puzzle");
   tinte("#fff");
   if(vista==="papelera"){ pintarPapelera(); return; }
