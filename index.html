@@ -48,13 +48,6 @@ button,select{font:inherit;color:inherit;background:none;border:0;cursor:pointer
 #sent{height:0}
 @media(max-width:899px){
   .barra .contador{display:none}.contador.cm{display:block}
-  /* al bajar por el índice o las series, el menú y los filtros quedan fijos pero más chicos */
-  .barra.comp{padding:6px var(--pad);gap:3px 12px}
-  .barra.comp .izq{gap:2px 12px}
-  .barra.comp .vistas{gap:0 min(10px,2.4vw);flex-wrap:nowrap;max-width:100%}
-  .barra.comp .vistas button,.barra.comp .vistas a{font-size:min(11px,2.7vw);padding:2px 0;border-bottom-width:1.5px;white-space:nowrap}
-  .barra.comp .filtros{gap:10px}
-  .barra.comp .filtros select{font-size:12px;padding:2px 12px 2px 0}
 }
 .barra.sinfiltros .filtros{display:none}
 @media(max-width:899px){.filtros{flex:1 0 100%;flex-wrap:nowrap;gap:12px}.filtros select{flex:1 1 0;min-width:0;width:100%}}
@@ -186,7 +179,7 @@ main.sinpad{padding:0;min-height:0}
 .pap-txt{padding:28px var(--pad) 14px}.pap-txt p{max-width:46em}
 @media(min-width:900px){.pap-txt.gx p{font-size:clamp(10px,1.1vw,22px)}.pap-txt p{max-width:none;white-space:nowrap;font-size:clamp(14px,1.55vw,22px)}.pap-txt br.mb{display:none}}
 .pap-txt p{font-size:clamp(17px,1.8vw,22px);line-height:1.4;letter-spacing:-.01em}
-@media(max-width:899px){.pap-txt.gx{padding:10px var(--pad) 4px}.pap-txt.gx p{font-size:12px;line-height:1.3}}
+
 .par{isolation:isolate;background:radial-gradient(ellipse at 18% 28%,rgba(76,46,182,.26),transparent 58%),radial-gradient(ellipse at 82% 72%,rgba(251,134,226,.13),transparent 52%),radial-gradient(ellipse at 70% 15%,rgba(60,98,204,.16),transparent 45%),#000;position:relative;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;border-top:1px solid #000}
 .pz{position:absolute;left:0;top:0;text-align:left;will-change:transform,opacity;transform-origin:50% 50%}
 .pz img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:var(--line);pointer-events:none}
@@ -224,6 +217,20 @@ html[data-modo=catarsis] [data-c="5"]{--cbg:#9A92C3;--ink:#000}
 html[data-modo=catarsis] [data-c="6"]{--cbg:#F39859;--ink:#000}
 html[data-modo=catarsis] [data-c="7"]{--cbg:#FB86E2;--ink:#000}
 html[data-modo=catarsis] [data-c="8"]{--cbg:#FC4049;--ink:#000}
+
+/* Celular: el bloque de títulos se achica de forma continua (--p va de 0 a 1 según el scroll; en Galaxia, Papelera y Puzzle queda siempre chico) */
+@media(max-width:899px){
+  .barra{padding:calc(12px - 6px*var(--p,0)) var(--pad)}
+  .izq{gap:calc(6px - 4px*var(--p,0)) 12px}
+  .vistas{position:relative;gap:calc(4px - 4px*var(--p,0)) calc(20px + (min(10px,2.4vw) - 20px)*var(--p,0))}
+  .vistas button,.vistas a{font-size:calc(17px + (min(11px,2.7vw) - 17px)*var(--p,0));padding:calc(4px - 2px*var(--p,0)) 0;border-bottom-width:calc(2px - .5px*var(--p,0))}
+  .vistas.nw{flex-wrap:nowrap}
+  .vistas.arm{display:block;height:var(--vh)}
+  .vistas.arm>*{position:absolute;left:0;top:0;white-space:nowrap}
+  .filtros select{font-size:calc(15px - 3px*var(--p,0));padding-top:calc(4px - 2px*var(--p,0));padding-bottom:calc(4px - 2px*var(--p,0))}
+  .pap-txt.gx,.pap-txt.pp{padding:10px var(--pad) 4px}
+  .pap-txt.gx p,.pap-txt.pp p{font-size:12px;line-height:1.3}
+}
 </style>
 <script>try{var m=localStorage.getItem("1990-modo");if(m)document.documentElement.dataset.modo=m}catch(e){}</script>
 </head>
@@ -445,11 +452,32 @@ const codB = i => `LB_${String(LADOB[i].fecha).slice(-2)}_${pad(i+1)}`;
 const arteB = i => LADOB[i].img || arte({n:900+i,tipo:"croquis"});
 let loopB=0;
 /* el slider mide en PC lo mismo que el menú (de Índice a Descargables); en celular, de lado a lado */
-function actCompacta(){ const b=$(".barra"), on=(vista==="indice"||vista==="series")&&$("#sent").getBoundingClientRect().top<-24;
-  if(on===b.classList.contains("comp")) return;
-  if(on){ const h0=b.offsetHeight; b.classList.add("comp"); b.style.marginBottom=Math.max(0,h0-b.offsetHeight)+"px"; }   /* el hueco que deja la barra al achicarse se reserva: el contenido no salta */
-  else{ b.classList.remove("comp"); b.style.marginBottom=""; } }
-addEventListener("scroll",actCompacta,{passive:true}); addEventListener("resize",()=>{ const b=$(".barra"); b.classList.remove("comp"); b.style.marginBottom=""; actCompacta(); });
+/* Celular: títulos del menú que se achican de forma continua. Cada botón viaja entre su lugar en el menú grande y su lugar en el chico */
+const mqCel=matchMedia("(max-width:899px)"); let bar={ok:false,p:-1,key:"",H0:null};
+const lerp=(a,b,t)=>a+(b-a)*t;
+function desarmar(){ const b=$(".barra"), v=b.querySelector(".vistas"); v.classList.remove("arm","nw"); v.style.removeProperty("--vh"); b.style.removeProperty("--p"); b.style.marginBottom="";
+  [...v.children].forEach(e=>{ e.style.transform=""; e.style.opacity=""; }); bar={ok:false,p:-1,key:"",H0:null}; }
+function medirBarra(){ const b=$(".barra"), v=b.querySelector(".vistas"); if(!mqCel.matches){ if(bar.ok||b.style.getPropertyValue("--p")) desarmar(); return; }
+  desarmar(); const it=[...v.children], pos=()=>it.map(e=>[e.offsetLeft,e.offsetTop]);
+  b.style.setProperty("--p",0); const r0=pos(), h0=v.offsetHeight;
+  v.classList.add("nw"); b.style.setProperty("--p",1); const r1=pos(), h1=v.offsetHeight; v.classList.remove("nw");
+  v.classList.add("arm"); bar={ok:true,p:-1,key:"",H0:null,it,r0,r1,h0,h1,v,b}; }
+function moverBarra(p){ const {it,r0,r1,h0,h1,v,b}=bar, q=Math.min(1,p/.6); b.style.setProperty("--p",q);   /* q: tamaño de letra y espacios (llega al final antes que el resto, así todo entra en una fila) */
+  const gx=parseFloat(getComputedStyle(v).columnGap)||0, w=it.map(e=>e.offsetWidth), F=[]; let x=0; w.forEach((ww,i)=>{ F[i]=x; x+=ww+gx; });   /* F: dónde caería cada botón en una sola fila al tamaño actual */
+  v.style.setProperty("--vh",lerp(h0,h1,Math.min(1,Math.max(0,(p-.3)/.4)))+"px");
+  it.forEach((e,i)=>{ const baja=Math.abs(r0[i][1]-r1[i][1])>4;   /* los de la segunda fila se desvanecen allá y reaparecen al final de la primera */
+    let X,Y,O=1; if(!baja){ X=lerp(r0[i][0],F[i],q); Y=lerp(r0[i][1],r1[i][1],q); } else if(p<.3){ X=r0[i][0]; Y=r0[i][1]; O=1-p/.3; } else if(p<.6){ X=r0[i][0]; Y=r0[i][1]; O=0; } else { X=F[i]; Y=r1[i][1]; O=(p-.6)/.4; }
+    e.style.transform=`translate(${X}px,${Y}px)`; e.style.opacity=O<1?O:""; }); }
+function actCompacta(){ if(!mqCel.matches){ if(bar.ok) desarmar(); return; }
+  if(!bar.ok) medirBarra(); if(!bar.ok) return;
+  const b=bar.b, esp=vista==="galaxia"||vista==="papelera"||vista==="puzzle";
+  const p = esp ? 1 : Math.min(1,Math.max(0,(-24-$("#sent").getBoundingClientRect().top)/110)), key=p+"|"+esp;
+  if(key===bar.key) return; bar.key=key;
+  if(esp){ moverBarra(1); b.style.marginBottom=""; bar.H0=null; return; }
+  if(bar.H0===null){ moverBarra(0); bar.H0=b.offsetHeight; }   /* alto del menú grande: se reserva para que el contenido no salte al achicarse */
+  moverBarra(p); b.style.marginBottom=p>0?Math.max(0,bar.H0-b.offsetHeight)+"px":""; }
+addEventListener("scroll",actCompacta,{passive:true}); addEventListener("resize",()=>{ medirBarra(); actCompacta(); });
+addEventListener("load",()=>{ medirBarra(); actCompacta(); }); if(document.fonts) document.fonts.ready.then(()=>{ medirBarra(); actCompacta(); });
 function medirTam(){ const a=document.querySelector(".vistas button"), z=document.querySelector(".vistas a");
   const pc=matchMedia("(min-width:900px)").matches;
   document.documentElement.style.setProperty("--tamw", pc&&a&&z ? Math.round(z.getBoundingClientRect().right-a.getBoundingClientRect().left)+"px" : "100%"); }
@@ -520,7 +548,7 @@ function iniciarPuzzle(){
 }
 /* Papelera: archivador vertical */
 function pintarPapelera(){
-  $("#main").innerHTML = `<div class="pap-txt"><p>Algunos dibujos quedan a mitad de camino, se abandonan o simplemente no convencen.<br class="mb"> El proceso siempre deja algo.</p></div>
+  $("#main").innerHTML = `<div class="pap-txt pp"><p>Algunos dibujos quedan a mitad de camino, se abandonan o simplemente no convencen.<br class="mb"> El proceso siempre deja algo.</p></div>
    <div class="arch" id="arch" aria-label="Papelera">${LADOB.map((b,i)=>`<button class="cd" data-b="${i}" aria-label="${codB(i)}"><b>${codB(i)}</b><img src="${arteB(i)}" alt="" draggable="false"></button>`).join("")}
    <p class="pista">Rueda o arrastrá hacia arriba y abajo para recorrer el archivador.</p></div>`;
   iniciarArch();
