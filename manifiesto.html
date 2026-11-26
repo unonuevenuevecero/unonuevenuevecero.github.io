@@ -54,8 +54,9 @@ h1{font-size:clamp(44px,11vw,120px);font-weight:800;letter-spacing:-.06em;line-h
 .p{font-size:clamp(20px,2.6vw,30px);line-height:1.32;letter-spacing:-.02em;font-weight:500;margin:0 0 34vh}
 .p.corto{font-size:clamp(28px,4.4vw,56px);font-weight:700;letter-spacing:-.04em;line-height:1.05}
 .disc{margin:0 0 30vh;max-width:30rem;font-size:clamp(12px,1.4vw,14px);font-weight:300;line-height:1.35;color:var(--grey)}
-.p.n{display:grid;grid-template-columns:2.1em 1fr;column-gap:.35em;align-items:start}
-.p.n .num{font-size:2em;font-weight:800;line-height:.92;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.p.n{position:relative}
+.p.n .num{position:absolute;right:100%;top:0;margin-right:.18em;font-size:2em;font-weight:800;line-height:.92;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+@media(max-width:899px){main{padding-left:calc(var(--pad) + 30px)}}
 @media(prefers-reduced-motion:reduce){#escena figure{transition:none}}
 html[data-modo=dark]{--ink:#fff;--paper:#000}
 html[data-modo=catarsis] body{background:var(--paper)}
@@ -71,7 +72,6 @@ html[data-modo=dark] .mano{background:#000}
 <main>
   <h1>MANIFIESTO</h1>
   <p class="sub">Del lat. manifestus «claro», «evidente» o «que se deja ver»</p>
-  <p class="antes">Esto una vez fue un block de notas.</p>
   <p class="disc">Este archivo no pretende reunir obras definitivas ni construir una trayectoria. Es apenas un registro de intentos, intereses y obsesiones pasajeras que, de otro modo, terminarían olvidados en algún cajón.</p>
 
   <p class="p n" data-i="rafaela londres reposera gunta"><b class="num">1</b><span>Dibujar por el acto mismo de hacerlo. No hay una finalidad clara ni la obligación de llegar a algún lado. Ninguna línea tiene que convertirse en algo, ni ninguna hoja merece, necesariamente, ser reconocida.</span></p>
