@@ -45,7 +45,7 @@ main{position:relative;z-index:1;max-width:44rem;margin:0 auto;padding:22vh var(
 h1{font-size:clamp(44px,11vw,120px);font-weight:800;letter-spacing:-.06em;line-height:.9}
 .sub{font-style:italic;opacity:.7;margin:14px 0 30vh;font-size:clamp(16px,2vw,20px)}
 .sub{margin-bottom:10px}
-.antes{margin:0 0 30vh;font-size:clamp(12px,1.4vw,14px);font-weight:300;line-height:1.35;color:var(--grey)}
+.antes{margin:0 0 1.1em;font-size:clamp(12px,1.4vw,14px);font-weight:300;line-height:1.35;color:var(--grey)}
 .banner .bd{margin-left:auto}
 @media(max-width:899px){
   .banner{justify-content:flex-start;align-items:flex-start;min-height:calc(var(--fs)*4)}
@@ -53,6 +53,9 @@ h1{font-size:clamp(44px,11vw,120px);font-weight:800;letter-spacing:-.06em;line-h
 }
 .p{font-size:clamp(20px,2.6vw,30px);line-height:1.32;letter-spacing:-.02em;font-weight:500;margin:0 0 34vh}
 .p.corto{font-size:clamp(28px,4.4vw,56px);font-weight:700;letter-spacing:-.04em;line-height:1.05}
+.disc{margin:0 0 30vh;max-width:30rem;font-size:clamp(12px,1.4vw,14px);font-weight:300;line-height:1.35;color:var(--grey)}
+.p.n{display:grid;grid-template-columns:2.1em 1fr;column-gap:.35em;align-items:start}
+.p.n .num{font-size:2em;font-weight:800;line-height:.92;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 @media(prefers-reduced-motion:reduce){#escena figure{transition:none}}
 html[data-modo=dark]{--ink:#fff;--paper:#000}
 html[data-modo=catarsis] body{background:var(--paper)}
@@ -68,19 +71,16 @@ html[data-modo=dark] .mano{background:#000}
 <main>
   <h1>MANIFIESTO</h1>
   <p class="sub">Del lat. manifestus «claro», «evidente» o «que se deja ver»</p>
-  <p class="antes">Había una vez un block de notas que se convirtió en manifiesto</p>
+  <p class="antes">Esto una vez fue un block de notas.</p>
+  <p class="disc">Este archivo no pretende reunir obras definitivas ni construir una trayectoria. Es apenas un registro de intentos, intereses y obsesiones pasajeras que, de otro modo, terminarían olvidados en algún cajón.</p>
 
-  <p class="p" data-i="rafaela londres reposera">No se trata de dibujar para haber dibujado.<br>Se trata de dibujar por el acto mismo de hacerlo.<br>Sin una finalidad demasiado clara, sin la obligación de llegar a algún lugar. Sin esperar que cada línea se convierta en algo, que cada hoja merezca conservarse o que cada resultado tenga algún valor más allá del tiempo que nos ocupó.</p>
-  <p class="p" data-i="sovietico shadow">Este archivo no pretende reunir obras definitivas ni construir una trayectoria. Es apenas un registro de intentos, intereses, obsesiones pasajeras y momentos de curiosidad. Un lugar para guardar lo que, de otro modo, probablemente terminaría olvidado en algún cajón.</p>
-  <p class="p corto" data-i="esclavo gunta akira">El proceso importa. Incluso más que el resultado.</p>
-  <p class="p" data-i="lego rueda airmax">No hay una intención de hacer ARTE, con mayúsculas. Hay ganas de probar, de jugar, de equivocarse, de encontrar algo que no estábamos buscando.</p>
-  <p class="p" data-i="moneda sugus pokemon">Un dibujo es, en cierta medida, descartable. Cumple su función mientras nos permite avanzar hacia el siguiente. Una vez terminado, deja de pertenecernos un poco. Podemos abandonarlo, intervenirlo, alterarlo o simplemente dejarlo ir.</p>
-  <p class="p" data-i="symns mpc asma">Publicarlo es una forma de liberarlo. Sacarlo del cuaderno, de la carpeta digital o del escritorio. Ponerlo en circulación. Si después aparece la necesidad de modificarlo, también vale. La intervención digital, la mezcla de técnicas y la experimentación son parte del juego.</p>
-  <p class="p corto dos" data-i="babel odisea">No hay una meta.<br>No hay una versión final.</p>
-  <p class="p" data-i="figaro redondos obey">En un presente que exige velocidad, eficiencia, resultados y utilidad, sentarse a dibujar durante horas algo que no necesariamente sirve para nada es una forma de resistencia. Una actividad lenta, a veces absurda, difícil de justificar. Y justamente por eso, necesaria.</p>
-  <p class="p" data-i="gameboy evangelion nasa">Las herramientas cambian. Las posibilidades se amplían. La tecnología, incluida la inteligencia artificial, puede ser una herramienta extraordinaria para explorar, producir e imaginar. Pero hay algo que interesa preservar: la decisión de hacer. No se trata de delegar la búsqueda, sino de encontrar nuevas maneras de llevarla adelante, manteniendo el criterio propio, humano.</p>
-  <p class="p" data-i="sosa yugioh">Tampoco se trata de crear para otros. No hay un encargo, un público al que satisfacer ni una expectativa que cumplir. Si alguien encuentra algo en estos dibujos, bienvenido sea. Pero no es el motivo por el que existen.</p>
-  <p class="p" data-i="dante eyes infamous">Ningún dibujo está mal. Puede gustarnos o no, podemos conservarlo, modificarlo o descartarlo. Pero no hay un tribunal al que rendirle cuentas.</p>
+  <p class="p n" data-i="rafaela londres reposera gunta"><b class="num">1</b><span>Dibujar por el acto mismo de hacerlo. No hay una finalidad clara ni la obligación de llegar a algún lado. Ninguna línea tiene que convertirse en algo, ni ninguna hoja merece, necesariamente, ser reconocida.</span></p>
+  <p class="p n" data-i="lego rueda airmax akira"><b class="num">2</b><span>No hay intención de hacer ARTE, con mayúsculas. Hay ganas de probar, jugar, equivocarse y encontrar algo que, la mayoría de las veces, no se buscaba.</span></p>
+  <p class="p n" data-i="sosa yugioh dante eyes"><b class="num">3</b><span>No se crea para otros. No hay encargo, público ni expectativa. Ningún dibujo está mal: puede gustarnos o no, pero no hay un tribunal al que rendirle cuentas. Si alguien encuentra algo en los dibujos, bienvenido, pero ese no es el motivo por el que existen.</span></p>
+  <p class="p n" data-i="moneda sugus pokemon esclavo"><b class="num">4</b><span>Un dibujo es descartable. Cumple su función mientras permite avanzar al siguiente. Una vez terminado, deja de pertenecernos un poco, y es válido abandonarlo, intervenirlo o dejarlo ir.</span></p>
+  <p class="p n" data-i="figaro redondos obey infamous"><b class="num">5</b><span>En un presente que exige velocidad, eficiencia y resultados, dibujar durante horas algo que no sirve para nada es una forma de resistencia. Es una actividad lenta, a veces absurda, difícil de justificar. Y justamente por eso, necesaria.</span></p>
+  <p class="p n" data-i="symns mpc asma sovietico shadow"><b class="num">6</b><span>Publicar es liberar. Es sacar el dibujo del cuaderno o de la carpeta y ponerlo en circulación.</span></p>
+  <p class="p n" data-i="gameboy evangelion nasa babel odisea"><b class="num">7</b><span>La tecnología, incluida la inteligencia artificial, puede ser una herramienta extraordinaria para explorar, producir e imaginar. Pero hay algo que interesa preservar: la decisión de hacer. No se trata de delegar las búsquedas, sino de encontrar nuevas formas de llevarlas adelante, manteniendo el criterio propio y humano.</span></p>
 </main>
 
 <section class="fin">
