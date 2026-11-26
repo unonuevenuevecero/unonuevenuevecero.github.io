@@ -266,9 +266,9 @@ html[data-modo=catarsis] [data-c="8"]{--cbg:#FC4049;--ink:#000}
       <button data-v="indice" aria-pressed="true">Index</button>
       <button data-v="series" aria-pressed="false">Series</button>
       <button data-v="galaxia" aria-pressed="false">Galaxia</button>
-      <button data-v="papelera" aria-pressed="false">Papelera</button>
       <button data-v="puzzle" aria-pressed="false">Puzzle</button>
       <button id="azar">Random</button>
+      <a href="generador.html">Generador</a>
       <a href="https://drive.google.com/open?id=1aMEb2G78fCjUIiA7cUmZWVwAYb7DbS_N&usp=drive_fs" target="_blank" rel="noopener">Descargables</a>
     </div>
     <button class="limpiar" id="limpiar" hidden>Limpiar</button>
@@ -478,7 +478,7 @@ function actCompacta(){ if(!mqCel.matches){ if(bar.ok) desarmar(); return; }
   moverBarra(p); b.style.marginBottom=p>0?Math.max(0,bar.H0-b.offsetHeight)+"px":""; }
 addEventListener("scroll",actCompacta,{passive:true}); addEventListener("resize",()=>{ medirBarra(); actCompacta(); });
 addEventListener("load",()=>{ medirBarra(); actCompacta(); }); if(document.fonts) document.fonts.ready.then(()=>{ medirBarra(); actCompacta(); });
-function medirTam(){ const a=document.querySelector(".vistas button"), z=document.querySelector(".vistas a");
+function medirTam(){ const a=document.querySelector(".vistas button"), z=[...document.querySelectorAll(".vistas a")].pop();
   const pc=matchMedia("(min-width:900px)").matches;
   document.documentElement.style.setProperty("--tamw", pc&&a&&z ? Math.round(z.getBoundingClientRect().right-a.getBoundingClientRect().left)+"px" : "100%"); }
 addEventListener("resize",medirTam); addEventListener("load",medirTam); if(document.fonts) document.fonts.ready.then(medirTam); medirTam();
@@ -789,7 +789,7 @@ document.addEventListener("keydown",e=>{
   else if(k==="i") ir("indice");
   else if(k==="s") ir("series");
   else if(k==="g") ir("galaxia");
-  else if(k==="p") ir("papelera");
+  else if(k==="p") location.href="generador.html";
   else if(k==="r") azar();
 });
 
