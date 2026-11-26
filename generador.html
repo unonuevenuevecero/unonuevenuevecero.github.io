@@ -386,10 +386,10 @@ function semillaNueva(){ let s,k,i=0; do{ s=(Math.random()*2**31)>>>0; k=claveDe
   recientes.push(k.join(":")); recientes=recientes.slice(-10); try{ localStorage.setItem("1990-gen-recientes",JSON.stringify(recientes)); }catch(_){} return s; }
 function nuevo(){ semilla=semillaNueva(); fecha=ahora(); history.replaceState(null,"","#p="+semilla.toString(36)+"."+fecha); $("#est").textContent="";
   const cv=$("#cv"), off=document.createElement("canvas"), w=$(".lienzo").clientWidth*Math.min(2,devicePixelRatio||1); poster(off,semilla,w/297*25.4,fecha,150); hay=true; botones(); glitchA(cv,off); }
-/* Animación: glitch en blanco y negro de 1 segundo antes de mostrar el póster */
+/* Animación: glitch en blanco y negro de medio segundo antes de mostrar el póster */
 function glitchA(cv,nuevoCv){ const x=cv.getContext("2d"), W=cv.width, H=cv.height, viejo=document.createElement("canvas"); viejo.width=W; viejo.height=H; viejo.getContext("2d").drawImage(cv,0,0);
   if(matchMedia("(prefers-reduced-motion:reduce)").matches){ x.drawImage(nuevoCv,0,0); return; }
-  const t0=performance.now(), D=1000;
+  const t0=performance.now(), D=500;
   function f(t){ const p=(t-t0)/D; x.setTransform(1,0,0,1,0,0);
     if(p>=1){ x.filter="none"; x.drawImage(nuevoCv,0,0); return; }
     x.filter="grayscale(1) contrast(4)"; x.drawImage(p<.5?viejo:nuevoCv,0,0); x.filter="none";
@@ -407,7 +407,7 @@ function slot(){ const el=$("#tit"), txt=el.textContent, AZ="ABCDEFGHIJKLMNOPQRS
   el.textContent=""; const sp=[...txt].map(c=>{ const s=document.createElement("span"); s.setAttribute("aria-hidden","true"); const i=document.createElement("i"); i.textContent=c; s.appendChild(i); el.appendChild(s); return {i,c}; });
   const t0=performance.now();
   (function f(t){ let vivo=false; sp.forEach((o,k)=>{ const fin=900+k*170; if(t-t0<fin){ vivo=true; const ch=AZ[Math.floor(Math.random()*AZ.length)]; o.i.textContent=k?ch.toLowerCase():ch; o.i.style.transform=`translateY(${(Math.random()*30-15).toFixed(0)}%)`; } else { o.i.textContent=o.c; o.i.style.transform=""; } });
-    if(vivo) setTimeout(()=>requestAnimationFrame(f),55); })(t0); }
+    if(vivo) setTimeout(()=>requestAnimationFrame(f),55); else el.textContent=txt; })(t0); }
 const nombre=()=>"1990_generativeposter_"+fecha;
 function bajar(blob,n){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=n; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000); }
 function ocupado(b,on,t){ document.querySelectorAll(".acc button").forEach(x=>x.disabled=on); $("#est").textContent=t||""; }
